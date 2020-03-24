@@ -20,8 +20,17 @@ let make = () => {
   );
   React.useEffect0(() => {
     if (ServiceWorker.supportsServiceWorker()) {
-      dispatch(Supported(true));
       Js.log("[App] Browser supports service workers");
+      dispatch(Supported(true));
+      ServiceWorker.windowAddEventListener("load", () => {
+        Js.Promise.(ServiceWorker.register("demo-sw.js")
+          |> then_((b) => {
+            Js.log("[App] ServiceWorker registration successful with scope: ");
+            resolve(b);
+          })
+        );
+        ();
+      })
     } else {
       dispatch(Supported(false));
       Js.log("[App] Browser does *not* support service workers");

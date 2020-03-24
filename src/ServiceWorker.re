@@ -11,3 +11,22 @@ let supportsServiceWorker = ():bool => {
     | None => false
   }
 }
+
+module Window {
+  type window;
+  [@bs.send]
+  external addEventListener : (window, string, unit => unit) => unit =
+    "addEventListener";
+  [@bs.val] external window: window = "window";
+};
+
+let windowAddEventListener = (eventName:string, func:unit => unit):unit => {
+  Window.addEventListener(Window.window, eventName, func);
+};
+
+type serviceWorkerRegistration = {
+  scope:string,
+};
+
+[@bs.val] external register: (string) => Js.Promise.t(serviceWorkerRegistration) = "navigator.serviceWorker.register";
+
