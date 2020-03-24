@@ -16,12 +16,15 @@
   <div id="demo">
     <div>
       <h1>hello service worker!</h1>
-      <a href="features.html">Features</a>
+      <a href="features.html">See Features</a>
+      <h2>Your Browser:</h2>
+      <div>Supports ServiceWorker?<span id="supported">❌</span></div>
     </div>
   </div>
   <script type="text/javascript">
     if ('serviceWorker' in navigator) {
       console.log("[App] Browser supports service workers");
+      document.getElementById("supported").textContent = "✔";
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('demo-sw.js').then(function(registration) {
           console.log('[App] ServiceWorker registration successful with scope: ', registration.scope);
@@ -29,6 +32,8 @@
           console.log('[App] ServiceWorker registration failed: ', err);
         });
       });
+    } else {
+      console.log("[App] Browser does *not* support service workers");
     }
   </script>
 </body>
