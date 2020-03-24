@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Divertise bs-service-worker Example</title>
+</head>
+<body>
+  <script>
+    // stub a variable ReactJS checks. ReactJS assumes you're using a bundler, NodeJS or similar system that provides it the `process.env.NODE_ENV` variable.
+    window.process = {
+      env: {
+        NODE_ENV: 'development'
+      }
+    };
+  </script>
+  <div id="demo">
+    <div>
+      <h1>hello service worker!</h1>
+      <a href="features.html">Features</a>
+    </div>
+  </div>
+  <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+      console.log("[App] Browser supports service workers");
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('demo-sw.js').then(function(registration) {
+          console.log('[App] ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+          console.log('[App] ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
