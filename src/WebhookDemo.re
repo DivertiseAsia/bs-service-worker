@@ -1,4 +1,7 @@
 [@react.component]
 let make = () => {
-  <h1>{ReasonReact.string("hello service worker!")}</h1>
+  <div>
+    <h1>{ReasonReact.string("hello service worker!")}</h1>
+    <a href="features.html">{ReasonReact.string("Features")}</a>
+  </div>
 }
