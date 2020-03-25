@@ -92,7 +92,7 @@ let make = () => {
     }
   };
   <div>
-    <h1>{string("hello service worker!")}</h1>
+    <h1>{string("hello service worker! (reason)")}</h1>
     <a href="features.html">{string("See Features")}</a>
     <h2>{string("Your Browser:")}</h2>
     <table>
@@ -101,8 +101,8 @@ let make = () => {
         <tr key="registration"><td>{string("Registered ServiceWorker now?")}</td><td>{successIndicator(state.registerSuccess, "registerSuccess")}</td></tr>
         <tr key="failureSuccess"><td>{string("Registering Nonexistant ServiceWorker fails?")}</td><td>{successIndicator(state.failureSuccess, "failureSuccess")}</td></tr>
         <tr key="unregisterSuccess">
-          <td>{string("Unregister works?")}{state.registration !== None ? <button id="unregister" onClick=unregisterServiceWorker>{string("Unregister")}</button> : ReasonReact.null}</td>
-          <td>{successIndicator(state.unregisterSuccess, "unregisterSuccess")}</td>
+          <td>{string("Unregister works?")}</td>
+          <td>{state.registration !== None ? <button id="unregister" onClick=unregisterServiceWorker>{string("Unregister")}</button> : successIndicator(state.unregisterSuccess, "unregisterSuccess")}</td>
         </tr>
       </tbody>
     </table>
