@@ -3,11 +3,19 @@ open ReasonReact;
 type state = {
   supported: bool,
   registration: option(ServiceWorker.serviceWorkerRegistration),
+  failureSuccess: bool,
 };
 
 type action =
   | Supported(bool)
-  | Registered(ServiceWorker.serviceWorkerRegistration);
+  | Registered(ServiceWorker.serviceWorkerRegistration)
+  | SuccessfulFailure;
+
+let successIndicator = (condition:bool, id:string) => {
+  <span id=id key=id>
+    {string(condition ? {j|✔|j} : {j|❌|j})}
+  </span>
+};
 
 [@react.component]
 let make = () => {
@@ -16,10 +24,12 @@ let make = () => {
       switch (action) {
         | Supported(supported) => {...state, supported}
         | Registered(registration) => {...state, registration: Some(registration)}
+        | SuccessfulFailure => {...state, failureSuccess:true}
       },
       {
         supported: false, 
         registration: None,
+        failureSuccess: false,
       }
   );
   React.useEffect0(() => {
@@ -38,6 +48,16 @@ let make = () => {
             resolve(None)
           })
         );
+        Js.Promise.(ServiceWorker.register("nonexistant-sw.js")
+          |> then_((b:ServiceWorker.serviceWorkerRegistration) => {
+            resolve(Some(b));
+          })
+          |> catch(e => {
+            Js.log2("[App] ServiceWorker registration failed (expected): ", e);
+            dispatch(SuccessfulFailure);
+            resolve(None)
+          })
+        );
       })
     } else {
       dispatch(Supported(false));
@@ -49,7 +69,8 @@ let make = () => {
     <h1>{string("hello service worker!")}</h1>
     <a href="features.html">{string("See Features")}</a>
     <h2>{string("Your Browser:")}</h2>
-    <div>{string("Supports ServiceWorker?")} <span id="supported">{string(state.supported ? {j|✔|j} : {j|❌|j})}</span></div>
-    <div>{string("Registered ServiceWorker now?")} <span id="registered">{string(state.registration !== None ? {j|✔|j} : {j|❌|j})}</span></div>
+    <div>{string("Supports ServiceWorker?")} {successIndicator(state.supported, "supported")}</div>
+    <div>{string("Registered ServiceWorker now?")} {successIndicator(state.registration !== None, "registration")}</div>
+    <div>{string("Registering Nonexistant ServiceWorker fails?")} {successIndicator(state.failureSuccess, "failureSuccess")}</div>
   </div>
 }

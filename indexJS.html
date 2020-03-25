@@ -20,18 +20,27 @@
       <h2>Your Browser:</h2>
       <div>Supports ServiceWorker?<span id="supported">❌</span></div>
       <div>Registered ServiceWorker now?<span id="registered">❌</span></div>
+      <div>Registering Nonexistant ServiceWorker fails?<span id="failureSuccess">❌</span></div>
     </div>
   </div>
   <script type="text/javascript">
+    function helperMarkAsSuccess(id) {
+      document.getElementById(id).textContent = "✔";
+    }
     if ('serviceWorker' in navigator) {
       console.log("[App] Browser supports service workers");
-      document.getElementById("supported").textContent = "✔";
+      helperMarkAsSuccess("supported");
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('demo-sw.js').then(function(registration) {
           console.log('[App] ServiceWorker registration successful with scope: ', registration.scope);
-          document.getElementById("registered").textContent = "✔";
+          helperMarkAsSuccess("registered");
         }, function(err) {
           console.log('[App] ServiceWorker registration failed: ', err);
+        });
+        navigator.serviceWorker.register('nonexistant-sw.js').then(function(registration) {
+        }, function(err) {
+          console.log('[App] ServiceWorker registration failed (expected): ', err);
+          helperMarkAsSuccess("failureSuccess");
         });
       });
     } else {
