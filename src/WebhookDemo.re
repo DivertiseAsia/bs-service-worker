@@ -69,8 +69,12 @@ let make = () => {
     <h1>{string("hello service worker!")}</h1>
     <a href="features.html">{string("See Features")}</a>
     <h2>{string("Your Browser:")}</h2>
-    <div>{string("Supports ServiceWorker?")} {successIndicator(state.supported, "supported")}</div>
-    <div>{string("Registered ServiceWorker now?")} {successIndicator(state.registration !== None, "registration")}</div>
-    <div>{string("Registering Nonexistant ServiceWorker fails?")} {successIndicator(state.failureSuccess, "failureSuccess")}</div>
+    <table>
+      <tbody>
+        <tr key="supported"><td>{string("Supports ServiceWorker?")}</td><td>{successIndicator(state.supported, "supported")}</td></tr>
+        <tr key="registration"><td>{string("Registered ServiceWorker now?")}</td><td>{successIndicator(state.registration !== None, "registration")}</td></tr>
+        <tr key="failureSuccess"><td>{string("Registering Nonexistant ServiceWorker fails?")}</td><td>{successIndicator(state.failureSuccess, "failureSuccess")}</td></tr>
+      </tbody>
+    </table>
   </div>
 }
