@@ -32,5 +32,13 @@ type serviceWorkerRegistration = {
   updateViaCache: string,
 };
 
+let unregister: (serviceWorkerRegistration) => Js.Promise.t(bool) = [%bs.raw
+  {|
+  function (serviceWorkerRegistration) {
+    return serviceWorkerRegistration.unregister();
+  }
+  |}
+];
+
 [@bs.val] external register: (string) => Js.Promise.t(serviceWorkerRegistration) = "navigator.serviceWorker.register";
 

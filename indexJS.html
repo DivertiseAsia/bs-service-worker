@@ -21,15 +21,35 @@
       <table>
         <tbody>
           <tr><td>Supports ServiceWorker?</td><td><span id="supported">❌</span></td></tr>
-          <tr><td>Registered ServiceWorker now?</td><td><span id="registered">❌</span></td></tr>
+          <tr><td>Registered ServiceWorker now?</td><td><span id="registerSuccess">❌</span></td></tr>
           <tr><td>Registering Nonexistant ServiceWorker fails?</td><td><span id="failureSuccess">❌</span></td></tr>
+          <tr>
+            <td>Unregister works? <button id="unregister" style="display:none;" onClick="unregisterServiceWorker()">unregister</button></td>
+            <td><span id="unregisterSuccess">❌</span></td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
   <script type="text/javascript">
+    serviceWorkerRegistration = null;
     function helperMarkAsSuccess(id) {
       document.getElementById(id).textContent = "✔";
+    }
+    function unregisterServiceWorker() {
+      if (serviceWorkerRegistration) {
+        serviceWorkerRegistration.unregister().then(function(success) {
+          if (success === true) {
+            console.log('[App] ServiceWorker unregister success');
+            document.getElementById("unregister").style = "display: none;";
+            helperMarkAsSuccess("unregisterSuccess");
+          } else {
+            console.log('[App] ServiceWorker unregister failed');
+          }
+        })
+      } else {
+        console.log("[App] No ServiceWorker to unregister");
+      }
     }
     if ('serviceWorker' in navigator) {
       console.log("[App] Browser supports service workers");
@@ -37,7 +57,9 @@
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('demo-sw.js').then(function(registration) {
           console.log('[App] ServiceWorker registration successful with scope: ', registration.scope);
-          helperMarkAsSuccess("registered");
+          serviceWorkerRegistration = registration;
+          document.getElementById("unregister").style = "";
+          helperMarkAsSuccess("registerSuccess");
         }, function(err) {
           console.log('[App] ServiceWorker registration failed: ', err);
         });

@@ -2,13 +2,16 @@ open ReasonReact;
 
 type state = {
   supported: bool,
+  registerSuccess: bool,
   registration: option(ServiceWorker.serviceWorkerRegistration),
   failureSuccess: bool,
+  unregisterSuccess: bool,
 };
 
 type action =
   | Supported(bool)
   | Registered(ServiceWorker.serviceWorkerRegistration)
+  | UnregisterSuccess
   | SuccessfulFailure;
 
 let successIndicator = (condition:bool, id:string) => {
@@ -23,12 +26,15 @@ let make = () => {
     (state, action) =>
       switch (action) {
         | Supported(supported) => {...state, supported}
-        | Registered(registration) => {...state, registration: Some(registration)}
+        | Registered(registration) => {...state, registerSuccess: true, registration: Some(registration)}
+        | UnregisterSuccess => {...state, unregisterSuccess: true, registration: None}
         | SuccessfulFailure => {...state, failureSuccess:true}
       },
       {
         supported: false, 
+        registerSuccess: false,
         registration: None,
+        unregisterSuccess: false,
         failureSuccess: false,
       }
   );
@@ -47,7 +53,7 @@ let make = () => {
             Js.log2("[App] ServiceWorker registration failed: ", e);
             resolve(None)
           })
-        );
+        ) |> ignore;
         Js.Promise.(ServiceWorker.register("nonexistant-sw.js")
           |> then_((b:ServiceWorker.serviceWorkerRegistration) => {
             resolve(Some(b));
@@ -65,6 +71,26 @@ let make = () => {
     }
     None;
   });
+  let unregisterServiceWorker = (_) => {
+    switch (state.registration) {
+      | Some(registration) => {
+        Js.Promise.(ServiceWorker.unregister(registration)
+          |> then_((success:bool) => {
+            if (success == true) {
+              Js.log("[App] ServiceWorker unregister success");
+              dispatch(UnregisterSuccess);
+            } else {
+              Js.log("[App] ServiceWorker unregister failed");
+            }
+            resolve(success);
+          })
+        ) |> ignore;
+      }
+      | None => {
+        Js.log("[App] No ServiceWorker to unregister")
+      }
+    }
+  };
   <div>
     <h1>{string("hello service worker!")}</h1>
     <a href="features.html">{string("See Features")}</a>
@@ -72,8 +98,12 @@ let make = () => {
     <table>
       <tbody>
         <tr key="supported"><td>{string("Supports ServiceWorker?")}</td><td>{successIndicator(state.supported, "supported")}</td></tr>
-        <tr key="registration"><td>{string("Registered ServiceWorker now?")}</td><td>{successIndicator(state.registration !== None, "registration")}</td></tr>
+        <tr key="registration"><td>{string("Registered ServiceWorker now?")}</td><td>{successIndicator(state.registerSuccess, "registerSuccess")}</td></tr>
         <tr key="failureSuccess"><td>{string("Registering Nonexistant ServiceWorker fails?")}</td><td>{successIndicator(state.failureSuccess, "failureSuccess")}</td></tr>
+        <tr key="unregisterSuccess">
+          <td>{string("Unregister works?")}{state.registration !== None ? <button id="unregister" onClick=unregisterServiceWorker>{string("Unregister")}</button> : ReasonReact.null}</td>
+          <td>{successIndicator(state.unregisterSuccess, "unregisterSuccess")}</td>
+        </tr>
       </tbody>
     </table>
   </div>
