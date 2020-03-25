@@ -26,6 +26,7 @@ let windowAddEventListener = (eventName:string, func:unit => unit):unit => {
 
 type serviceWorkerRegistration = {
   scope:string,
+  updateViaCache: string,
 };
 
 [@bs.val] external register: (string) => Js.Promise.t(serviceWorkerRegistration) = "navigator.serviceWorker.register";

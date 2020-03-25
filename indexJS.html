@@ -19,6 +19,7 @@
       <a href="features.html">See Features</a>
       <h2>Your Browser:</h2>
       <div>Supports ServiceWorker?<span id="supported">❌</span></div>
+      <div>Registered ServiceWorker now?<span id="registered">❌</span></div>
     </div>
   </div>
   <script type="text/javascript">
@@ -28,6 +29,7 @@
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('demo-sw.js').then(function(registration) {
           console.log('[App] ServiceWorker registration successful with scope: ', registration.scope);
+          document.getElementById("registered").textContent = "✔";
         }, function(err) {
           console.log('[App] ServiceWorker registration failed: ', err);
         });
