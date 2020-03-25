@@ -38,7 +38,6 @@ let make = () => {
             resolve(None)
           })
         );
-        ();
       })
     } else {
       dispatch(Supported(false));

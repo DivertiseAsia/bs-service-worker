@@ -15,12 +15,12 @@ let supportsServiceWorker = ():bool => {
 module Window {
   type window;
   [@bs.send]
-  external addEventListener : (window, string, unit => unit) => unit =
+  external addEventListener : (window, string, unit => 'a) => unit =
     "addEventListener";
   [@bs.val] external window: window = "window";
 };
 
-let windowAddEventListener = (eventName:string, func:unit => unit):unit => {
+let windowAddEventListener = (eventName:string, func):unit => {
   Window.addEventListener(Window.window, eventName, func);
 };
 
