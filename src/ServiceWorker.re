@@ -1,8 +1,8 @@
-type serviceWorker;
+type serviceWorkerContainer;
 
 module Navigator {
   type t = {
-    serviceWorker:option(serviceWorker)
+    serviceWorker:option(serviceWorkerContainer)
   };
   [@bs.val] external navigator: t = "navigator";
   let _supportsServiceWorker = ():bool => {
