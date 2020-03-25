@@ -3,14 +3,14 @@ open ReasonReact;
 type state = {
   supported: bool,
   registerSuccess: bool,
-  registration: option(ServiceWorker.serviceWorkerRegistration),
+  registration: option(ServiceWorker.ServiceWorkerRegistration.t),
   failureSuccess: bool,
   unregisterSuccess: bool,
 };
 
 type action =
   | Supported(bool)
-  | Registered(ServiceWorker.serviceWorkerRegistration)
+  | Registered(ServiceWorker.ServiceWorkerRegistration.t)
   | UnregisterSuccess
   | SuccessfulFailure;
 
@@ -27,7 +27,7 @@ let make = () => {
       switch (action) {
         | Supported(supported) => {...state, supported}
         | Registered(registration) => {...state, registerSuccess: true, registration: Some(registration)}
-        | UnregisterSuccess => {...state, unregisterSuccess: true, registration: None}
+        | UnregisterSuccess => {...state, unregisterSuccess: true}
         | SuccessfulFailure => {...state, failureSuccess:true}
       },
       {
@@ -44,9 +44,9 @@ let make = () => {
       dispatch(Supported(true));
       ServiceWorker.windowAddEventListener("load", () => {
         Js.Promise.(ServiceWorker.register("demo-sw.js")
-          |> then_((b:ServiceWorker.serviceWorkerRegistration) => {
+          |> then_((b:ServiceWorker.ServiceWorkerRegistration.raw) => {
             Js.log("[App] ServiceWorker registration successful with scope: " ++ b.scope);
-            dispatch(Registered(b))
+            dispatch(Registered(ServiceWorker.ServiceWorkerRegistration.jsToTyped(b)))
             resolve(Some(b));
           })
           |> catch(e => {
@@ -55,7 +55,7 @@ let make = () => {
           })
         ) |> ignore;
         Js.Promise.(ServiceWorker.register("nonexistant-sw.js")
-          |> then_((b:ServiceWorker.serviceWorkerRegistration) => {
+          |> then_((b:ServiceWorker.ServiceWorkerRegistration.raw) => {
             resolve(Some(b));
           })
           |> catch(e => {
@@ -74,7 +74,7 @@ let make = () => {
   let unregisterServiceWorker = (_) => {
     switch (state.registration) {
       | Some(registration) => {
-        Js.Promise.(ServiceWorker.unregister(registration)
+        Js.Promise.(ServiceWorker.unregister(registration.raw)
           |> then_((success:bool) => {
             if (success == true) {
               Js.log("[App] ServiceWorker unregister success");
@@ -102,9 +102,50 @@ let make = () => {
         <tr key="failureSuccess"><td>{string("Registering Nonexistant ServiceWorker fails?")}</td><td>{successIndicator(state.failureSuccess, "failureSuccess")}</td></tr>
         <tr key="unregisterSuccess">
           <td>{string("Unregister works?")}</td>
-          <td>{state.registration !== None ? <button id="unregister" onClick=unregisterServiceWorker>{string("Unregister")}</button> : successIndicator(state.unregisterSuccess, "unregisterSuccess")}</td>
+          <td>{(state.registration !== None && state.unregisterSuccess === false) ? <button id="unregister" onClick=unregisterServiceWorker>{string("Unregister")}</button> : successIndicator(state.unregisterSuccess, "unregisterSuccess")}</td>
         </tr>
       </tbody>
     </table>
+    <h2>{string("Service Worker from Registration")}</h2>
+    {
+      switch(state.registration) {
+        | None => ReasonReact.null
+        | Some(registration) => {
+          switch (registration.worker) {
+            | None => ReasonReact.null
+            | Some(x) => {
+              <table>
+                <tbody>
+                  <tr><td>{string("Script URL")}</td><td>{string(x.scriptURL)}</td></tr>
+                  <tr><td>{string("Current State")}</td><td>{string(x.state)}</td></tr>
+                  // <tr><td>{string("State Found In Registration")}</td><td>
+                  //   {string({switch (registration.active, registration.waiting, registration.installing) {
+                  //     | (Some(_), _, _) => "active"
+                  //     | (None, Some(_), _) => "waiting"
+                  //     | (None, None, Some(_)) => "installing"
+                  //     | _ => "n/a"
+                  //   }})}
+                  // </td></tr>
+                </tbody>
+              </table>
+            }
+          }
+        }
+      }
+    }
+    <h2>{string("Service Worker from Controller")}</h2>
+    {
+      switch(ServiceWorker.getController()) {
+        | None => ReasonReact.null
+        | Some(x) => {
+          <table>
+            <tbody>
+              <tr><td>{string("Script URL")}</td><td>{string(x.scriptURL)}</td></tr>
+              <tr><td>{string("State")}</td><td>{string(x.state)}</td></tr>
+            </tbody>
+          </table>
+        }
+      }
+    }
   </div>
 }

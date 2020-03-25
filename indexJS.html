@@ -29,12 +29,46 @@
           </tr>
         </tbody>
       </table>
+      <h2>Service Worker from Registration</h2>
+      <table>
+        <tbody>
+          <tr><td>Script URL</td><td><span id="scriptURL">n/a</span></td></tr>
+          <tr><td>Current State <button onClick="getFromRegistration()">Refresh</button></td><td><span id="currentState">n/a</span></td></tr>
+          <tr><td>State Found In Registration</td><td><span id="foundInRegistration">n/a</span></td></tr>
+        </tbody>
+      </table>
+      <h2>Service Worker from Controller <button onClick="getFromController()">Refresh</button></h2>
+      <table>
+        <tbody>
+          <tr><td>Script URL</td><td><span id="scriptURLController">n/a</span></td></tr>
+          <tr><td>State</td><td><span id="stateController">n/a</span></td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <script type="text/javascript">
     serviceWorkerRegistration = null;
+    serviceWorker = null;
     function helperMarkAsSuccess(id) {
       document.getElementById(id).textContent = "✔";
+    }
+    function getFromRegistration() {
+      if (serviceWorker) {
+        document.getElementById("currentState").textContent = serviceWorker.state;
+        document.getElementById("scriptURL").textContent = serviceWorker.scriptURL;
+      } else {
+        document.getElementById("currentState").textContent = "n/a";
+        document.getElementById("scriptURL").textContent = "n/a";
+      }
+    }
+    function getFromController() {
+      if (navigator.serviceWorker.controller) {
+        document.getElementById("stateController").textContent = navigator.serviceWorker.controller.state;
+        document.getElementById("scriptURLController").textContent = navigator.serviceWorker.controller.scriptURL;
+      } else {
+        document.getElementById("stateController").textContent = "n/a";
+        document.getElementById("scriptURLController").textContent = "n/a";
+      }
     }
     function unregisterServiceWorker() {
       if (serviceWorkerRegistration) {
@@ -60,6 +94,19 @@
           serviceWorkerRegistration = registration;
           document.getElementById("unregister").style = "";
           helperMarkAsSuccess("registerSuccess");
+          let foundInRegistration = "";
+          if (serviceWorkerRegistration.active) {
+            serviceWorker = serviceWorkerRegistration.active;
+            foundInRegistration = "active";
+          } else if (serviceWorkerRegistration.installing) {
+            serviceWorker = serviceWorkerRegistration.installing;
+            foundInRegistration = "installing";
+          } else if (serviceWorkerRegistration.waiting) {
+            serviceWorker = serviceWorkerRegistration.waiting;
+            foundInRegistration = "waiting";
+          }
+          document.getElementById("foundInRegistration").textContent = foundInRegistration;
+          getFromRegistration();
         }, function(err) {
           console.log('[App] ServiceWorker registration failed: ', err);
         });
