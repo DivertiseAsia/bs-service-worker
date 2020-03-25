@@ -23,7 +23,7 @@ let make = () => {
       }
   );
   React.useEffect0(() => {
-    if (ServiceWorker.supportsServiceWorker()) {
+    if (ServiceWorker.isSupported()) {
       Js.log("[App] Browser supports service workers");
       dispatch(Supported(true));
       ServiceWorker.windowAddEventListener("load", () => {

@@ -1,23 +1,26 @@
 type serviceWorker;
-type navigator = {
-  serviceWorker:option(serviceWorker)
-};
 
-[@bs.val] external navigator: navigator = "navigator";
-
-let supportsServiceWorker = ():bool => {
-  switch(navigator.serviceWorker) {
-    | Some(x) => true;
-    | None => false
+module Navigator {
+  type t = {
+    serviceWorker:option(serviceWorker)
+  };
+  [@bs.val] external navigator: t = "navigator";
+  let _supportsServiceWorker = ():bool => {
+    switch(navigator.serviceWorker) {
+      | Some(_) => true;
+      | None => false
+    }
   }
 }
 
+let isSupported = Navigator._supportsServiceWorker;
+
 module Window {
-  type window;
+  type t;
   [@bs.send]
-  external addEventListener : (window, string, unit => 'a) => unit =
+  external addEventListener : (t, string, unit => 'a) => unit =
     "addEventListener";
-  [@bs.val] external window: window = "window";
+  [@bs.val] external window: t = "window";
 };
 
 let windowAddEventListener = (eventName:string, func):unit => {
