@@ -8,44 +8,13 @@ type serviceWorkerContainer = {
 };
 
 module Registration {
-  type js = {
-    scope:string,
-    updateViaCache: string,
-    active: Js.Nullable.t(serviceWorker),
-    installing: Js.Nullable.t(serviceWorker),
-    waiting: Js.Nullable.t(serviceWorker),
-  };
-  type t = {
+  type t = Js.t({
     .
     scope: string,
     updateViaCache: string,
     worker: option(serviceWorker),
     unregister: unit => Js.Promise.t(bool),
-  };
-  [@bs.send] external _unregister: (js) => Js.Promise.t(bool) = "unregister";
-  let _getRawWorker(registration:js) = {
-    switch (Js.Nullable.toOption(registration.active), 
-      Js.Nullable.toOption(registration.installing), 
-      Js.Nullable.toOption(registration.waiting)) {
-      | (Some(x), _, _) => ("active", Some(x))
-      | (None, Some(x), _) => ("installing", Some(x))
-      | (None, None, Some(x)) => ("waiting", Some(x))
-      | _ => ("", None)
-    };
-  };
-  let jsToLib = (jsRecord:js):t => {
-    let (initialState, worker) = _getRawWorker(jsRecord);
-    let obj:t = {
-      pub scope = jsRecord.scope;
-      pub updateViaCache = jsRecord.updateViaCache;
-      pub worker = worker;
-      val raw = jsRecord;
-      pub unregister = () => {
-        _unregister(raw)
-      }
-    };
-    obj;
-  };
+  });
 }
 
 module Navigator {
@@ -69,16 +38,15 @@ module Window {
   [@bs.val] external window: t = "window";
 };
 
-let unregisterJs = Registration._unregister;
-[@bs.val] external registerJs: (string) => Js.Promise.t(Registration.js) = "navigator.serviceWorker.register";
+[@bs.val] external registerJs: (string) => Js.Promise.t(Registration.t) = "navigator.serviceWorker.register";
 [@bs.val] external _controller: Js.Nullable.t(serviceWorker) = "navigator.serviceWorker.controller"
 
 exception RegistrationException(Js.Promise.error);
 let register = (filename:string):Js.Promise.t(Registration.t) => {
   Js.Promise.(
     registerJs(filename)
-    |> then_((b:Registration.js) => {
-      resolve(Registration.jsToLib(b));
+    |> then_((b:Registration.t) => {
+      resolve(b);
     })
     |> catch(e => {
       reject(RegistrationException(e))
