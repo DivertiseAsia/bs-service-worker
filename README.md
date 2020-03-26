@@ -9,8 +9,6 @@ Buckle script `service-worker` binding
 
 # Example
 
-
-
 ```
 if (ServiceWorker.isSupported()) {
   ServiceWorker.windowAddEventListener("load", () => {
@@ -27,4 +25,3 @@ if (ServiceWorker.isSupported()) {
   })
 }
 ```
-Please take a look at example/Simple.re
