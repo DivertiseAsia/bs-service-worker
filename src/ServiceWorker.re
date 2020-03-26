@@ -7,7 +7,7 @@ type serviceWorkerContainer = {
   controller: option(serviceWorker)
 };
 
-module ServiceWorkerRegistration {
+module Registration {
   type js = {
     scope:string,
     updateViaCache: string,
@@ -69,16 +69,16 @@ module Window {
   [@bs.val] external window: t = "window";
 };
 
-let unregisterJs = ServiceWorkerRegistration._unregister;
-[@bs.val] external registerJs: (string) => Js.Promise.t(ServiceWorkerRegistration.js) = "navigator.serviceWorker.register";
+let unregisterJs = Registration._unregister;
+[@bs.val] external registerJs: (string) => Js.Promise.t(Registration.js) = "navigator.serviceWorker.register";
 [@bs.val] external _controller: Js.Nullable.t(serviceWorker) = "navigator.serviceWorker.controller"
 
 exception RegistrationException(Js.Promise.error);
-let register = (filename:string):Js.Promise.t(ServiceWorkerRegistration.t) => {
+let register = (filename:string):Js.Promise.t(Registration.t) => {
   Js.Promise.(
     registerJs(filename)
-    |> then_((b:ServiceWorkerRegistration.js) => {
-      resolve(ServiceWorkerRegistration.jsToLib(b));
+    |> then_((b:Registration.js) => {
+      resolve(Registration.jsToLib(b));
     })
     |> catch(e => {
       reject(RegistrationException(e))
