@@ -26,3 +26,5 @@ if (ServiceWorker.isSupported()) {
   })
 }
 ```
+
+More examples can be found at [@divertiseasia/bs-service-worker-examples](https://github.com/DivertiseAsia/bs-service-worker-examples)
