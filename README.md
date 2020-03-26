@@ -10,6 +10,7 @@ Buckle script `service-worker` binding
 # Example
 
 ```
+open DivertiseasiaBsServiceWorker;
 if (ServiceWorker.isSupported()) {
   ServiceWorker.windowAddEventListener("load", () => {
     Js.Promise.(ServiceWorker.register("demo-sw.js")
