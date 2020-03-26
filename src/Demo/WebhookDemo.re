@@ -44,7 +44,7 @@ let make = () => {
       dispatch(Supported(true));
       ServiceWorker.windowAddEventListener("load", () => {
         Js.Promise.(ServiceWorker.register("demo-sw.js")
-          |> then_((b:ServiceWorker.ServiceWorkerRegistration.raw) => {
+          |> then_((b:ServiceWorker.ServiceWorkerRegistration.js) => {
             Js.log("[App] ServiceWorker registration successful with scope: " ++ b.scope);
             dispatch(Registered(ServiceWorker.ServiceWorkerRegistration.jsToTyped(b)))
             resolve(Some(b));
@@ -55,7 +55,7 @@ let make = () => {
           })
         ) |> ignore;
         Js.Promise.(ServiceWorker.register("nonexistant-sw.js")
-          |> then_((b:ServiceWorker.ServiceWorkerRegistration.raw) => {
+          |> then_((b:ServiceWorker.ServiceWorkerRegistration.js) => {
             resolve(Some(b));
           })
           |> catch(e => {

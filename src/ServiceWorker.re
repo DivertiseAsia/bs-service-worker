@@ -37,7 +37,7 @@ let windowAddEventListener = (eventName:string, func):unit => {
 };
 
 module ServiceWorkerRegistration {
-  type raw = {
+  type js = {
     scope:string,
     updateViaCache: string,
     active: Js.Nullable.t(serviceWorker),
@@ -49,9 +49,9 @@ module ServiceWorkerRegistration {
     updateViaCache: string,
     worker: option(serviceWorker),
     initialState: string,
-    raw: raw,
+    raw: js,
   };
-  let _getRawWorker(registration:raw) = {
+  let _getRawWorker(registration:js) = {
     switch (Js.Nullable.toOption(registration.active), 
       Js.Nullable.toOption(registration.installing), 
       Js.Nullable.toOption(registration.waiting)) {
@@ -61,7 +61,7 @@ module ServiceWorkerRegistration {
       | _ => ("", None)
     };
   };
-  let jsToTyped = (raw:raw):t => {
+  let jsToTyped = (raw:js):t => {
     let (initialState, worker) = _getRawWorker(raw);
     {
       scope: raw.scope,
@@ -74,7 +74,7 @@ module ServiceWorkerRegistration {
 }
 
 
-[@bs.send] external unregister: (ServiceWorkerRegistration.raw) => Js.Promise.t(bool) = "unregister";
+[@bs.send] external unregister: (ServiceWorkerRegistration.js) => Js.Promise.t(bool) = "unregister";
 
-[@bs.val] external register: (string) => Js.Promise.t(ServiceWorkerRegistration.raw) = "navigator.serviceWorker.register";
+[@bs.val] external register: (string) => Js.Promise.t(ServiceWorkerRegistration.js) = "navigator.serviceWorker.register";
 

@@ -37,7 +37,7 @@ let make = () => {
       dispatch(Supported);
       ServiceWorker.windowAddEventListener("load", () => {
         Js.Promise.(ServiceWorker.register("demo-sw.js")
-          |> then_((b:ServiceWorker.ServiceWorkerRegistration.raw) => {
+          |> then_((b:ServiceWorker.ServiceWorkerRegistration.js) => {
             dispatch(Registered(ServiceWorker.ServiceWorkerRegistration.jsToTyped(b)))
             resolve(Some(b));
           })
