@@ -16,12 +16,13 @@ module ServiceWorkerRegistration {
     waiting: Js.Nullable.t(serviceWorker),
   };
   type t = {
-    scope:string,
+    .
+    scope: string,
     updateViaCache: string,
     worker: option(serviceWorker),
-    initialState: string,
-    raw: js,
+    unregister: unit => Js.Promise.t(bool),
   };
+  [@bs.send] external _unregister: (js) => Js.Promise.t(bool) = "unregister";
   let _getRawWorker(registration:js) = {
     switch (Js.Nullable.toOption(registration.active), 
       Js.Nullable.toOption(registration.installing), 
@@ -32,15 +33,18 @@ module ServiceWorkerRegistration {
       | _ => ("", None)
     };
   };
-  let jsToTyped = (raw:js):t => {
-    let (initialState, worker) = _getRawWorker(raw);
-    {
-      scope: raw.scope,
-      updateViaCache: raw.updateViaCache,
-      worker,
-      initialState,
-      raw
-    }
+  let jsToLib = (jsRecord:js):t => {
+    let (initialState, worker) = _getRawWorker(jsRecord);
+    let obj:t = {
+      pub scope = jsRecord.scope;
+      pub updateViaCache = jsRecord.updateViaCache;
+      pub worker = worker;
+      val raw = jsRecord;
+      pub unregister = () => {
+        _unregister(raw)
+      }
+    };
+    obj;
   };
 }
 
@@ -65,11 +69,22 @@ module Window {
   [@bs.val] external window: t = "window";
 };
 
-[@bs.send] external unregister: (ServiceWorkerRegistration.js) => Js.Promise.t(bool) = "unregister";
-[@bs.val] external register: (string) => Js.Promise.t(ServiceWorkerRegistration.js) = "navigator.serviceWorker.register";
-
+[@bs.send] external unregisterJs: (ServiceWorkerRegistration.js) => Js.Promise.t(bool) = "unregister";
+[@bs.val] external registerJs: (string) => Js.Promise.t(ServiceWorkerRegistration.js) = "navigator.serviceWorker.register";
 [@bs.val] external _controller: Js.Nullable.t(serviceWorker) = "navigator.serviceWorker.controller"
 
+exception RegistrationException(Js.Promise.error);
+let register = (filename:string):Js.Promise.t(ServiceWorkerRegistration.t) => {
+  Js.Promise.(
+    registerJs(filename)
+    |> then_((b:ServiceWorkerRegistration.js) => {
+      resolve(ServiceWorkerRegistration.jsToLib(b));
+    })
+    |> catch(e => {
+      reject(RegistrationException(e))
+    })
+  )
+};
 let isSupported = Navigator._supportsServiceWorker;
 let getController = () => Js.Nullable.toOption(_controller);
 

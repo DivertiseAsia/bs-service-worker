@@ -37,8 +37,8 @@ let make = () => {
       dispatch(Supported);
       ServiceWorker.windowAddEventListener("load", () => {
         Js.Promise.(ServiceWorker.register("demo-sw.js")
-          |> then_((b:ServiceWorker.ServiceWorkerRegistration.js) => {
-            dispatch(Registered(ServiceWorker.ServiceWorkerRegistration.jsToTyped(b)))
+          |> then_((b:ServiceWorker.ServiceWorkerRegistration.t) => {
+            dispatch(Registered(b))
             resolve(Some(b));
           })
           |> catch(e => {
@@ -53,7 +53,7 @@ let make = () => {
   let unregisterServiceWorker = (_) => {
     switch (state.registration) {
       | Some(registration) => {
-        Js.Promise.(ServiceWorker.unregister(registration.raw)
+        Js.Promise.(registration#unregister()
           |> then_((success:bool) => {
             if (success == true) {
               Js.log("[App] ServiceWorker unregister success");

@@ -44,9 +44,9 @@ let make = () => {
       dispatch(Supported(true));
       ServiceWorker.windowAddEventListener("load", () => {
         Js.Promise.(ServiceWorker.register("demo-sw.js")
-          |> then_((b:ServiceWorker.ServiceWorkerRegistration.js) => {
-            Js.log("[App] ServiceWorker registration successful with scope: " ++ b.scope);
-            dispatch(Registered(ServiceWorker.ServiceWorkerRegistration.jsToTyped(b)))
+          |> then_((b:ServiceWorker.ServiceWorkerRegistration.t) => {
+            Js.log("[App] ServiceWorker registration successful with scope: " ++ b#scope);
+            dispatch(Registered(b))
             resolve(Some(b));
           })
           |> catch(e => {
@@ -54,7 +54,7 @@ let make = () => {
             resolve(None)
           })
         ) |> ignore;
-        Js.Promise.(ServiceWorker.register("nonexistant-sw.js")
+        Js.Promise.(ServiceWorker.registerJs("nonexistant-sw.js")
           |> then_((b:ServiceWorker.ServiceWorkerRegistration.js) => {
             resolve(Some(b));
           })
@@ -74,7 +74,7 @@ let make = () => {
   let unregisterServiceWorker = (_) => {
     switch (state.registration) {
       | Some(registration) => {
-        Js.Promise.(ServiceWorker.unregister(registration.raw)
+        Js.Promise.(registration#unregister()
           |> then_((success:bool) => {
             if (success == true) {
               Js.log("[App] ServiceWorker unregister success");
@@ -112,7 +112,7 @@ let make = () => {
       switch(state.registration) {
         | None => ReasonReact.null
         | Some(registration) => {
-          switch (registration.worker) {
+          switch (registration#worker) {
             | None => ReasonReact.null
             | Some(x) => {
               <table>
