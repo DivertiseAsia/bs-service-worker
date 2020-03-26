@@ -69,7 +69,7 @@ module Window {
   [@bs.val] external window: t = "window";
 };
 
-[@bs.send] external unregisterJs: (ServiceWorkerRegistration.js) => Js.Promise.t(bool) = "unregister";
+let unregisterJs = ServiceWorkerRegistration._unregister;
 [@bs.val] external registerJs: (string) => Js.Promise.t(ServiceWorkerRegistration.js) = "navigator.serviceWorker.register";
 [@bs.val] external _controller: Js.Nullable.t(serviceWorker) = "navigator.serviceWorker.controller"
 
