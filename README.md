@@ -3,17 +3,28 @@ Buckle script `service-worker` binding
 
 # Installation
 
-`npm install`
+1. `npm install @divertiseasia/bs-service-worker --save`
+2. Add `@divertiseasia/bs-service-worker` to bsconfig.json
+3. Enjoy!
 
-# Demo
+# Example
 
-## Running it
 
-* `npm start`
-* `npm run server`
 
-## Notes
-
-* You should browse to localhost:8000 or `index.html` that shows `WebhookDemo.re` which contains the code as it can be used in ReasonML.
-* `indexJS.html` is available to help compare the JS to ReasonML equivalents 
-
+```
+if (ServiceWorker.isSupported()) {
+  ServiceWorker.windowAddEventListener("load", () => {
+    Js.Promise.(ServiceWorker.register("demo-sw.js")
+      |> then_((b:ServiceWorker.ServiceWorkerRegistration.t) => {
+        Js.log2("[App] ServiceWorker registration success: ", b#scope);
+        resolve(Some(b));
+      })
+      |> catch(e => {
+        Js.log2("[App] ServiceWorker registration failed (expected): ", e);
+        resolve(None)
+      })
+    ) |> ignore;
+  })
+}
+```
+Please take a look at example/Simple.re
