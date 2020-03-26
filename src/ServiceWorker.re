@@ -7,35 +7,6 @@ type serviceWorkerContainer = {
   controller: option(serviceWorker)
 };
 
-module Navigator {
-  type t = {
-    serviceWorker:option(serviceWorkerContainer),
-  };
-  [@bs.val] external navigator: t = "navigator";
-  let _supportsServiceWorker = ():bool => {
-    switch(navigator.serviceWorker) {
-      | Some(_) => true;
-      | None => false
-    }
-  }
-}
-[@bs.val] external _controller: Js.Nullable.t(serviceWorker) = "navigator.serviceWorker.controller"
-
-let isSupported = Navigator._supportsServiceWorker;
-let getController = () => Js.Nullable.toOption(_controller);
-
-module Window {
-  type t;
-  [@bs.send]
-  external addEventListener : (t, string, unit => 'a) => unit =
-    "addEventListener";
-  [@bs.val] external window: t = "window";
-};
-
-let windowAddEventListener = (eventName:string, func):unit => {
-  Window.addEventListener(Window.window, eventName, func);
-};
-
 module ServiceWorkerRegistration {
   type js = {
     scope:string,
@@ -73,8 +44,35 @@ module ServiceWorkerRegistration {
   };
 }
 
+module Navigator {
+  type t = {
+    serviceWorker:option(serviceWorkerContainer),
+  };
+  [@bs.val] external navigator: t = "navigator";
+  let _supportsServiceWorker = ():bool => {
+    switch(navigator.serviceWorker) {
+      | Some(_) => true;
+      | None => false
+    }
+  }
+}
+
+module Window {
+  type t;
+  [@bs.send]
+  external addEventListener : (t, string, unit => 'a) => unit =
+    "addEventListener";
+  [@bs.val] external window: t = "window";
+};
 
 [@bs.send] external unregister: (ServiceWorkerRegistration.js) => Js.Promise.t(bool) = "unregister";
-
 [@bs.val] external register: (string) => Js.Promise.t(ServiceWorkerRegistration.js) = "navigator.serviceWorker.register";
 
+[@bs.val] external _controller: Js.Nullable.t(serviceWorker) = "navigator.serviceWorker.controller"
+
+let isSupported = Navigator._supportsServiceWorker;
+let getController = () => Js.Nullable.toOption(_controller);
+
+let windowAddEventListener = (eventName:string, func):unit => {
+  Window.addEventListener(Window.window, eventName, func);
+};
