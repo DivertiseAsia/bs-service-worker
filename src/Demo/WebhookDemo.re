@@ -94,6 +94,7 @@ let make = () => {
   <div>
     <h1>{string("hello service worker! (reason)")}</h1>
     <a href="features.html">{string("See Features")}</a>
+    <a href="demo-minimal.html">{string("Minimal Demo")}</a>
     <h2>{string("Your Browser:")}</h2>
     <table>
       <tbody>
