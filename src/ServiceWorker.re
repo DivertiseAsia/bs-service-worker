@@ -14,7 +14,7 @@ module Registration {
     .
     scope: string,
     updateViaCache: string,
-    unregister: unit => Js.Promise.t(bool),
+    [@bs.meth] unregister: unit => Js.Promise.t(bool),
   });
 }
 
