@@ -2,10 +2,11 @@ type t = Js.t({.
   scriptURL: string,
   state: string,
 });
+type _serviceWorker = t;
 
 module Container {
   type t = Js.t({.
-    controller: option(t)
+    controller: Js.Nullable.t(_serviceWorker)
   });
 }
 
@@ -14,6 +15,7 @@ module Registration {
     .
     scope: string,
     updateViaCache: string,
+    active: Js.Nullable.t(_serviceWorker),
     [@bs.meth] unregister: unit => Js.Promise.t(bool),
   });
 }
