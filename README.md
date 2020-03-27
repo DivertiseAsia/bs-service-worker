@@ -11,20 +11,25 @@ Buckle script `service-worker` binding
 
 ```
 open DivertiseasiaBsServiceWorker;
-if (ServiceWorker.isSupported()) {
-  ServiceWorker.windowAddEventListener("load", () => {
-    Js.Promise.(ServiceWorker.register("demo-sw.js")
-      |> then_((b:ServiceWorker.ServiceWorkerRegistration.t) => {
-        Js.log2("[App] ServiceWorker registration success: ", b#scope);
+switch(ServiceWorker.maybeServiceWorker) {
+  | None => {
+    Js.log("[App] Browser does *not* support service workers");
+  }
+  | Some(worker) => {
+    Js.log("[App] Browser supports service workers");
+    open ServiceWorker;
+    Js.Promise.(worker->registerOnLoad("demo-sw.js")
+      |> then_((b:ServiceWorker.Registration.t) => {
+        Js.log("[App] ServiceWorker registration successful with scope: " ++ b##scope);
         resolve(Some(b));
       })
       |> catch(e => {
-        Js.log2("[App] ServiceWorker registration failed (expected): ", e);
+        Js.log2("[App] ServiceWorker registration failed: ", e);
         resolve(None)
       })
     ) |> ignore;
-  })
-}
+  }
+};
 ```
 
 More examples can be found at [@divertiseasia/bs-service-worker-examples](https://github.com/DivertiseAsia/bs-service-worker-examples)
