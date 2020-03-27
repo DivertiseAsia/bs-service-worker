@@ -29,6 +29,27 @@ module Window {
 [@bs.send] external register: (Container.t, string) => Js.Promise.t(Registration.t) = "register";
 [@bs.send] external getRegistration: (Container.t) => Js.Promise.t(Registration.t) = "getRegistration";
 
+exception RegistrationException(Js.Promise.error);
+let registerOnLoad = (container:Container.t, serviceWorkerFile:string):Js.Promise.t(Registration.t) => {
+  Js.Promise.make(
+     (~resolve as upper, ~reject as upperReject) => {
+      Window.addEventListener("load", () => {
+        (Js.Promise.(
+          register(container, serviceWorkerFile)
+          |> then_((b:Registration.t) => {
+            [@bs] upper(b);
+            resolve(true);
+          })
+          |> catch((e) => {
+            [@bs] upperReject(RegistrationException(e))
+            resolve(true)
+          })
+        ))
+      });
+    }
+  )
+};
+
 /*
 // To check
 switch(ServiceWorker.maybeServiceWorker){
