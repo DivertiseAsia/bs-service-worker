@@ -27,6 +27,7 @@ module Window {
 
 [@bs.scope "navigator"] [@bs.val] external maybeServiceWorker: option(Container.t) = "serviceWorker";
 [@bs.send] external register: (Container.t, string) => Js.Promise.t(Registration.t) = "register";
+[@bs.send] external getRegistration: (Container.t) => Js.Promise.t(Registration.t) = "getRegistration";
 
 /*
 // To check
