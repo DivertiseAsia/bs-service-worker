@@ -1,93 +1,68 @@
-type serviceWorker = {
+type t = Js.t({.
   scriptURL: string,
   state: string,
-};
+});
+type _serviceWorker = t;
 
-type serviceWorkerContainer = {
-  controller: option(serviceWorker)
-};
+module Container {
+  type t = Js.t({.
+    controller: Js.Nullable.t(_serviceWorker)
+  });
+}
 
-module ServiceWorkerRegistration {
-  type js = {
-    scope:string,
-    updateViaCache: string,
-    active: Js.Nullable.t(serviceWorker),
-    installing: Js.Nullable.t(serviceWorker),
-    waiting: Js.Nullable.t(serviceWorker),
-  };
-  type t = {
+module Registration {
+  type t = Js.t({
     .
     scope: string,
     updateViaCache: string,
-    worker: option(serviceWorker),
-    unregister: unit => Js.Promise.t(bool),
-  };
-  [@bs.send] external _unregister: (js) => Js.Promise.t(bool) = "unregister";
-  let _getRawWorker(registration:js) = {
-    switch (Js.Nullable.toOption(registration.active), 
-      Js.Nullable.toOption(registration.installing), 
-      Js.Nullable.toOption(registration.waiting)) {
-      | (Some(x), _, _) => ("active", Some(x))
-      | (None, Some(x), _) => ("installing", Some(x))
-      | (None, None, Some(x)) => ("waiting", Some(x))
-      | _ => ("", None)
-    };
-  };
-  let jsToLib = (jsRecord:js):t => {
-    let (initialState, worker) = _getRawWorker(jsRecord);
-    let obj:t = {
-      pub scope = jsRecord.scope;
-      pub updateViaCache = jsRecord.updateViaCache;
-      pub worker = worker;
-      val raw = jsRecord;
-      pub unregister = () => {
-        _unregister(raw)
-      }
-    };
-    obj;
-  };
-}
-
-module Navigator {
-  type t = {
-    serviceWorker:option(serviceWorkerContainer),
-  };
-  [@bs.val] external navigator: t = "navigator";
-  let _supportsServiceWorker = ():bool => {
-    switch(navigator.serviceWorker) {
-      | Some(_) => true;
-      | None => false
-    }
-  }
+    active: Js.Nullable.t(_serviceWorker),
+    [@bs.meth] unregister: unit => Js.Promise.t(bool),
+  });
 }
 
 module Window {
   type t;
-  [@bs.send]
-  external addEventListener : (t, string, unit => 'a) => unit =
-    "addEventListener";
-  [@bs.val] external window: t = "window";
+  [@bs.scope "window"][@bs.val] external addEventListener : (string, unit => 'a) => unit = "addEventListener";
 };
 
-let unregisterJs = ServiceWorkerRegistration._unregister;
-[@bs.val] external registerJs: (string) => Js.Promise.t(ServiceWorkerRegistration.js) = "navigator.serviceWorker.register";
-[@bs.val] external _controller: Js.Nullable.t(serviceWorker) = "navigator.serviceWorker.controller"
+[@bs.scope "navigator"] [@bs.val] external maybeServiceWorker: option(Container.t) = "serviceWorker";
+[@bs.send] external register: (Container.t, string) => Js.Promise.t(Registration.t) = "register";
+[@bs.send] external getRegistration: (Container.t) => Js.Promise.t(Registration.t) = "getRegistration";
 
 exception RegistrationException(Js.Promise.error);
-let register = (filename:string):Js.Promise.t(ServiceWorkerRegistration.t) => {
-  Js.Promise.(
-    registerJs(filename)
-    |> then_((b:ServiceWorkerRegistration.js) => {
-      resolve(ServiceWorkerRegistration.jsToLib(b));
-    })
-    |> catch(e => {
-      reject(RegistrationException(e))
-    })
+let registerOnLoad = (container:Container.t, serviceWorkerFile:string):Js.Promise.t(Registration.t) => {
+  Js.Promise.make(
+     (~resolve as upper, ~reject as upperReject) => {
+      Window.addEventListener("load", () => {
+        (Js.Promise.(
+          register(container, serviceWorkerFile)
+          |> then_((b:Registration.t) => {
+            [@bs] upper(b);
+            resolve(true);
+          })
+          |> catch((e) => {
+            [@bs] upperReject(RegistrationException(e))
+            resolve(true)
+          })
+        ))
+      });
+    }
   )
 };
-let isSupported = Navigator._supportsServiceWorker;
-let getController = () => Js.Nullable.toOption(_controller);
 
-let windowAddEventListener = (eventName:string, func):unit => {
-  Window.addEventListener(Window.window, eventName, func);
-};
+/*
+// To check
+switch(ServiceWorker.maybeServiceWorker){
+| None => Js.log("[App] No ServiceWorker");
+| Some(workerContainer) => Js.log2("Yes, there is a", worker##controller);
+}
+
+// To register
+workerContainer->register("filename")
+|> ... Handle promise ...
+
+// To work with Registration.t
+let handlerRegistartion = register => {
+  Js.log2("[App] ServiceWorker registration success: ", register##scope);
+}
+*/
