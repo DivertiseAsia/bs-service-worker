@@ -1,3 +1,9 @@
+/* 
+This is a main service worker type. The javascript type is `ServiceWorker`.
+But for the naming consistency, we will name it `controller`.
+As the object is actually obtained from `serviceWorker.controller`
+https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/controller
+*/
 type messagePort = Js.t({.
   [@bs.meth] postMessage: (string) => unit
 });
@@ -28,42 +34,26 @@ module Registration {
   });
 }
 
+/* This Service worker Container */
 module Container {
-  type t = Js.t({.
-    controller: Js.Nullable.t(controller)
-  });
-
-  [@bs.send] external register: (t, string) => Js.Promise.t(Registration.t) = "register";
-  [@bs.send] external getRegistration: (t) => Js.Promise.t(Registration.t) = "getRegistration";
-}
+    type t = Js.t({.
+      controller: Js.Nullable.t(controller)
+    });
+  
+    let register: (t, string) => Js.Promise.t(Registration.t);
+    let getRegistration: (t) => Js.Promise.t(Registration.t);
+};
 
 module Window {
   type t;
-  [@bs.scope "window"][@bs.val] external addEventListener : (string, unit => 'a) => unit = "addEventListener";
+  let addEventListener : (string, unit => 'a) => unit;
 };
 
-[@bs.scope "navigator"] [@bs.val] external maybeServiceWorker: option(Container.t) = "serviceWorker";
+let maybeServiceWorker: option(Container.t);
+let registerOnLoad : (Container.t, string) => Js.Promise.t(Registration.t);
 
 exception RegistrationException(Js.Promise.error);
-let registerOnLoad = (container:Container.t, serviceWorkerFile:string):Js.Promise.t(Registration.t) => {
-  Js.Promise.make(
-     (~resolve as upper, ~reject as upperReject) => {
-      Window.addEventListener("load", () => {
-        (Js.Promise.(
-          Container.register(container, serviceWorkerFile)
-          |> then_((b:Registration.t) => {
-            [@bs] upper(b);
-            resolve()
-          })
-          |> catch((e) => {
-            [@bs] upperReject(RegistrationException(e))
-            resolve()
-          })
-        ))
-      });
-    }
-  )
-};
+
 
 /*
 // To check
