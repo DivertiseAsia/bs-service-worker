@@ -8,6 +8,11 @@ switch(ServiceWorker.maybeServiceWorker) {
     Js.Promise.(worker->registerOnLoad("demo-sw.js")
       |> then_((b:ServiceWorker.Registration.t) => {
         Js.log("[App] ServiceWorker registration successful with scope: " ++ b##scope);
+        let c = Js.Nullable.toOption(worker##controller);
+        switch(c){
+        | Some(controller) => controller##onerror #= {(msg) =>Js.log2("error", msg)}
+        | None => ()
+        }
         resolve(Some(b));
       })
       |> catch(e => {
