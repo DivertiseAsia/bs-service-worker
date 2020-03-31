@@ -16,7 +16,7 @@ jobs:
         node-version: 10.0.0
     - name: npm install
       run: |
-        npm run install
+        npm install
         npm run build
     - name: npm publish
       run: |

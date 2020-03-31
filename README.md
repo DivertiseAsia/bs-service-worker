@@ -1,6 +1,10 @@
 # bs-service-worker
 Buckle script `service-worker` binding
 
+## Status
+* Master ![build](https://github.com/DivertiseAsia/bs-service-worker/workflows/build/badge.svg?branch=master)
+* Release ![npm-publish](https://github.com/DivertiseAsia/bs-service-worker/workflows/npm-publish/badge.svg?branch=release)
+
 # Installation
 
 1. `npm install @divertiseasia/bs-service-worker --save`
