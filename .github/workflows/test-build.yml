@@ -1,0 +1,22 @@
+name: test-build
+on:
+  push:
+    branches:
+      - master
+jobs:
+  test-build:
+    name: test-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.0.0
+    - name: npm install
+      run: |
+        npm run install
+        npm run build
+      env:
+        CI: true
