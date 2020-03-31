@@ -2,7 +2,7 @@
 Buckle script `service-worker` binding
 
 ## Status
-* Master ![test-build](https://github.com/DivertiseAsia/bs-service-worker/workflows/test-build/badge.svg?branch=master)
+* Master ![build](https://github.com/DivertiseAsia/bs-service-worker/workflows/build/badge.svg?branch=master)
 * Release ![npm-publish](https://github.com/DivertiseAsia/bs-service-worker/workflows/npm-publish/badge.svg?branch=release)
 
 # Installation

@@ -1,8 +1,8 @@
-name: test-build
+name: build
 on: [push]
 jobs:
-  test-build:
-    name: test-build
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
