@@ -16,20 +16,30 @@ type messageEvent = Js.t({.
   ports: Js.Array.t(messagePort)
 });
 
-type controller = Js.t({.
-  scriptURL: string,
-  state: string,
-  [@bs.set] onerror : ((string) => unit) => unit,
-  [@bs.set] onmessage : ((messageEvent) => unit) => unit,
-  [@bs.set] onmessageerror : ((string) => unit) => unit
-});
+module Controller {
+  module State {
+    type t;
+    let installing:t;
+    let installed:t;
+    let activating:t;
+    let activated:t;
+    let redundant:t;
+  }
+  type t = Js.t({.
+    scriptURL: string,
+    state: State.t,
+    [@bs.set] onerror : ((string) => unit) => unit,
+    [@bs.set] onmessage : ((messageEvent) => unit) => unit,
+    [@bs.set] onmessageerror : ((string) => unit) => unit
+  });
+}
 
 module Registration {
   type t = Js.t({
     .
     scope: string,
     updateViaCache: string,
-    active: Js.Nullable.t(controller),
+    active: Js.Nullable.t(Controller.t),
     [@bs.meth] unregister: unit => Js.Promise.t(bool),
   });
 }
@@ -37,7 +47,7 @@ module Registration {
 /* This Service worker Container */
 module Container {
     type t = Js.t({.
-      controller: Js.Nullable.t(controller)
+      controller: Js.Nullable.t(Controller.t)
     });
   
     let register: (t, string) => Js.Promise.t(Registration.t);
