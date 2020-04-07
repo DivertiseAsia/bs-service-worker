@@ -1,13 +1,3 @@
-[@bs.deriving abstract]
-type t = {
-  title: string,
-};
-let make = t;
-
-module Options {
-  type t;
-};
-
 module Permission : {
   type t;
   let default:t;
@@ -32,8 +22,11 @@ module Direction : {
     let rtl:t = "rtl"
 };
 
-[@bs.scope "window"] [@bs.val] external maybeNotification: option(t) = "Notification";
+type controller = Js.t({.
+  permission: Permission.t,
+});
 
-[@bs.send] external permission: (t) => Permission.t = "permission";
-[@bs.send] external requestPermission: (t) => Js.Promise.t(Permission.t) = "requestPermission";
+[@bs.scope "window"] [@bs.val] external maybeNotification: option(controller) = "Notification";
 
+[@bs.send] external requestPermission: (controller) => Js.Promise.t(Permission.t) = "requestPermission";
+[@bs.new] external createNotification : string => unit = "Notification";

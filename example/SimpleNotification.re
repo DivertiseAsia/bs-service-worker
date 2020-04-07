@@ -10,6 +10,7 @@ switch(Notification.maybeNotification) {
         Js.log2("[App] Permission request successful with answer: ", p);
         if (p == Permission.granted) {
           Js.log("[App] Permission granted");
+          createNotification("Test notification!")
         } else {
           Js.log("[App] Permission rejected");
         }
