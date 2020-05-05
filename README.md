@@ -14,7 +14,6 @@ Buckle script `service-worker` binding
 # Example
 
 ```
-open DivertiseasiaBsServiceWorker;
 switch(ServiceWorker.maybeServiceWorker) {
   | None => {
     Js.log("[App] Browser does *not* support service workers");
