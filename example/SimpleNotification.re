@@ -1,3 +1,4 @@
+open BsServiceWorker;
 switch(Notification.maybeNotification) {
   | None => {
     Js.log("[App] Browser does *not* support notifications");

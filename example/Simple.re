@@ -1,3 +1,4 @@
+open BsServiceWorker;
 switch(ServiceWorker.maybeServiceWorker) {
   | None => {
     Js.log("[App] Browser does *not* support service workers");
