@@ -9,11 +9,14 @@ switch(Notification.maybeNotification) {
     Js.Promise.(notification->requestPermission
       |> then_((p:Permission.t) => {
         Js.log2("[App] Permission request successful with answer: ", p);
-        if (p == Permission.granted) {
-          Js.log("[App] Permission granted");
-          createNotification("Test notification!")
-        } else {
-          Js.log("[App] Permission rejected");
+        switch(p) {
+          | `granted => {
+            Js.log("[App] Permission granted");
+            createNotification("Test notification!")
+          }
+          | _ => {
+            Js.log("[App] Permission rejected");
+          }
         }
         resolve();
       })

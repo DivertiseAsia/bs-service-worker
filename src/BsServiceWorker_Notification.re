@@ -1,13 +1,9 @@
-module Permission : {
-  type t;
-  let default:t;
-  let denied:t;
-  let granted:t;
-} = {
-    type t = string;
-    let default:t = "default"
-    let denied:t = "denied"
-    let granted:t = "granted"
+module Permission {
+  [@bs.deriving jsConverter]
+  type t = [
+    | [@bs.as "default"] `default
+    | [@bs.as "denied"] `denied
+    | [@bs.as "granted"] `granted ];
 };
 
 module Direction : {
