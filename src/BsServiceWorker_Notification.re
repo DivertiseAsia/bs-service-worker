@@ -28,5 +28,6 @@ type controller = Js.t({.
 
 [@bs.scope "window"] [@bs.val] external maybeNotification: option(controller) = "Notification";
 
+[@bs.get] external permission: (controller) => Permission.t = "permission";
 [@bs.send] external requestPermission: (controller) => Js.Promise.t(Permission.t) = "requestPermission";
 [@bs.new] external createNotification : string => unit = "Notification";
