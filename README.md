@@ -7,8 +7,8 @@ Buckle script `service-worker` binding
 
 # Installation
 
-1. `npm install @divertiseasia/bs-service-worker --save`
-2. Add `@divertiseasia/bs-service-worker` to bsconfig.json
+1. `npm install @divertise-asia/bs-service-worker --save`
+2. Add `@divertise-asia/bs-service-worker` to bsconfig.json
 3. Enjoy!
 
 # Example
@@ -36,4 +36,4 @@ switch(ServiceWorker.maybeServiceWorker) {
 };
 ```
 
-More examples can be found at [@divertiseasia/bs-service-worker-examples](https://github.com/DivertiseAsia/bs-service-worker-examples)
+More examples can be found at [@divertise-asia/bs-service-worker-examples](https://github.com/DivertiseAsia/bs-service-worker-examples)
