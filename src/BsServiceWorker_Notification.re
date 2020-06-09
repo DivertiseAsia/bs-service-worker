@@ -1,17 +1,3 @@
-module Permission : {
-  type t;
-  let default:t;
-  let denied:t;
-  let granted:t;
-  let unknow:t;
-} = {
-    type t = string;
-    let default:t = "default"
-    let denied:t = "denied"
-    let granted:t = "granted"
-    let unknow:t = "unknow"
-};
-
 module Direction : {
   type t;
   let auto:t;
@@ -24,12 +10,26 @@ module Direction : {
     let rtl:t = "rtl"
 };
 
+type permissionType = 
+  | Default
+  | Denied
+  | Granted
+  | Unknow;
+
+let mapStrPermissionType = permission: permissionType =>
+  switch (permission) {
+  | "default" => Default
+  | "denied" => Denied
+  | "granted" => Granted
+  | _ => Unknow
+  };
+
 type controller = Js.t({.
-  permission: Permission.t,
+  permission: string,
 });
 
 [@bs.scope "window"] [@bs.val] external maybeNotification: option(controller) = "Notification";
 
-[@bs.get] external permission: (controller) => Permission.t = "permission";
-[@bs.send] external requestPermission: (controller) => Js.Promise.t(Permission.t) = "requestPermission";
+[@bs.get] external permission: (controller) => string = "permission";
+[@bs.send] external requestPermission: (controller) => Js.Promise.t(string) = "requestPermission";
 [@bs.new] external createNotification : string => unit = "Notification";
