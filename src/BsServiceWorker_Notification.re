@@ -3,11 +3,13 @@ module Permission : {
   let default:t;
   let denied:t;
   let granted:t;
+  let unknow:t;
 } = {
     type t = string;
     let default:t = "default"
     let denied:t = "denied"
     let granted:t = "granted"
+    let unknow:t = "unknow"
 };
 
 module Direction : {
