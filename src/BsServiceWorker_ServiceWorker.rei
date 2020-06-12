@@ -27,6 +27,7 @@ type controller = Js.t({.
 module Registration {
   type t = Js.t({
     .
+    installing: string,
     scope: string,
     updateViaCache: string,
     active: Js.Nullable.t(controller),
@@ -42,6 +43,7 @@ module Container {
   
     let register: (t, string) => Js.Promise.t(Registration.t);
     let getRegistration: (t) => Js.Promise.t(Registration.t);
+    let addEventListener: (Registration.t, string, ('a => unit)) => unit;
 };
 
 module Window {
