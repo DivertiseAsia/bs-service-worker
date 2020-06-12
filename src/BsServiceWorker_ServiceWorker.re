@@ -21,11 +21,13 @@ type controller = Js.t({.
 module Registration {
   type t = Js.t({
     .
+    installing: string,
     scope: string,
     updateViaCache: string,
     active: Js.Nullable.t(controller),
     [@bs.meth] unregister: unit => Js.Promise.t(bool),
   });
+  
 }
 
 module Container {
@@ -35,6 +37,7 @@ module Container {
 
   [@bs.send] external register: (t, string) => Js.Promise.t(Registration.t) = "register";
   [@bs.send] external getRegistration: (t) => Js.Promise.t(Registration.t) = "getRegistration";
+  [@bs.send] external addEventListener : (Registration.t, string, ('a => unit)) => unit = "addEventListener";
 }
 
 module Window {
